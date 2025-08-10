@@ -1,0 +1,474 @@
+[
+    {
+        "Crop": "Rice",
+        "Temp Min": 10,
+        "Temp Max": 29,
+        "Humid Min": 27,
+        "Humid Max": 72,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Groundnut",
+        "Temp Min": 19,
+        "Temp Max": 43,
+        "Humid Min": 35,
+        "Humid Max": 92,
+        "Soil Level Needed": "Wet"
+    },
+    {
+        "Crop": "Maize",
+        "Temp Min": 16,
+        "Temp Max": 41,
+        "Humid Min": 43,
+        "Humid Max": 91,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Wheat",
+        "Temp Min": 14,
+        "Temp Max": 36,
+        "Humid Min": 45,
+        "Humid Max": 94,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Barley",
+        "Temp Min": 15,
+        "Temp Max": 35,
+        "Humid Min": 38,
+        "Humid Max": 82,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Soybean",
+        "Temp Min": 18,
+        "Temp Max": 38,
+        "Humid Min": 29,
+        "Humid Max": 77,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Cotton",
+        "Temp Min": 15,
+        "Temp Max": 38,
+        "Humid Min": 43,
+        "Humid Max": 100,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Sugarcane",
+        "Temp Min": 11,
+        "Temp Max": 36,
+        "Humid Min": 33,
+        "Humid Max": 76,
+        "Soil Level Needed": "Wet"
+    },
+    {
+        "Crop": "Millet",
+        "Temp Min": 17,
+        "Temp Max": 36,
+        "Humid Min": 35,
+        "Humid Max": 78,
+        "Soil Level Needed": "Wet"
+    },
+    {
+        "Crop": "Sorghum",
+        "Temp Min": 17,
+        "Temp Max": 32,
+        "Humid Min": 45,
+        "Humid Max": 100,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Peanut",
+        "Temp Min": 19,
+        "Temp Max": 36,
+        "Humid Min": 32,
+        "Humid Max": 79,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Sunflower",
+        "Temp Min": 16,
+        "Temp Max": 34,
+        "Humid Min": 43,
+        "Humid Max": 92,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Sesame",
+        "Temp Min": 20,
+        "Temp Max": 42,
+        "Humid Min": 45,
+        "Humid Max": 100,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Chickpea",
+        "Temp Min": 19,
+        "Temp Max": 36,
+        "Humid Min": 42,
+        "Humid Max": 82,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Lentil",
+        "Temp Min": 18,
+        "Temp Max": 34,
+        "Humid Min": 42,
+        "Humid Max": 83,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Pigeon Pea",
+        "Temp Min": 15,
+        "Temp Max": 31,
+        "Humid Min": 29,
+        "Humid Max": 73,
+        "Soil Level Needed": "Wet"
+    },
+    {
+        "Crop": "Kidney Bean",
+        "Temp Min": 16,
+        "Temp Max": 33,
+        "Humid Min": 34,
+        "Humid Max": 87,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Black Gram",
+        "Temp Min": 19,
+        "Temp Max": 36,
+        "Humid Min": 27,
+        "Humid Max": 70,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Green Gram",
+        "Temp Min": 17,
+        "Temp Max": 40,
+        "Humid Min": 36,
+        "Humid Max": 96,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Mustard",
+        "Temp Min": 15,
+        "Temp Max": 40,
+        "Humid Min": 45,
+        "Humid Max": 100,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Potato",
+        "Temp Min": 11,
+        "Temp Max": 35,
+        "Humid Min": 25,
+        "Humid Max": 73,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Tomato",
+        "Temp Min": 17,
+        "Temp Max": 34,
+        "Humid Min": 38,
+        "Humid Max": 80,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Onion",
+        "Temp Min": 17,
+        "Temp Max": 37,
+        "Humid Min": 33,
+        "Humid Max": 82,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Garlic",
+        "Temp Min": 16,
+        "Temp Max": 33,
+        "Humid Min": 43,
+        "Humid Max": 88,
+        "Soil Level Needed": "Wet"
+    },
+    {
+        "Crop": "Carrot",
+        "Temp Min": 11,
+        "Temp Max": 33,
+        "Humid Min": 39,
+        "Humid Max": 84,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Spinach",
+        "Temp Min": 12,
+        "Temp Max": 33,
+        "Humid Min": 28,
+        "Humid Max": 76,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Cabbage",
+        "Temp Min": 13,
+        "Temp Max": 37,
+        "Humid Min": 35,
+        "Humid Max": 78,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Cauliflower",
+        "Temp Min": 14,
+        "Temp Max": 35,
+        "Humid Min": 36,
+        "Humid Max": 76,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Brinjal",
+        "Temp Min": 14,
+        "Temp Max": 32,
+        "Humid Min": 41,
+        "Humid Max": 98,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Okra",
+        "Temp Min": 18,
+        "Temp Max": 43,
+        "Humid Min": 26,
+        "Humid Max": 68,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Pumpkin",
+        "Temp Min": 18,
+        "Temp Max": 33,
+        "Humid Min": 39,
+        "Humid Max": 79,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Bitter Gourd",
+        "Temp Min": 11,
+        "Temp Max": 32,
+        "Humid Min": 39,
+        "Humid Max": 88,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Bottle Gourd",
+        "Temp Min": 12,
+        "Temp Max": 27,
+        "Humid Min": 34,
+        "Humid Max": 81,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Cucumber",
+        "Temp Min": 18,
+        "Temp Max": 40,
+        "Humid Min": 27,
+        "Humid Max": 86,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Zucchini",
+        "Temp Min": 20,
+        "Temp Max": 39,
+        "Humid Min": 38,
+        "Humid Max": 87,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Peas",
+        "Temp Min": 17,
+        "Temp Max": 41,
+        "Humid Min": 36,
+        "Humid Max": 89,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Turnip",
+        "Temp Min": 16,
+        "Temp Max": 35,
+        "Humid Min": 29,
+        "Humid Max": 80,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Radish",
+        "Temp Min": 14,
+        "Temp Max": 30,
+        "Humid Min": 30,
+        "Humid Max": 80,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Beetroot",
+        "Temp Min": 18,
+        "Temp Max": 37,
+        "Humid Min": 44,
+        "Humid Max": 89,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Sweet Potato",
+        "Temp Min": 11,
+        "Temp Max": 34,
+        "Humid Min": 41,
+        "Humid Max": 98,
+        "Soil Level Needed": "Wet"
+    },
+    {
+        "Crop": "Yam",
+        "Temp Min": 10,
+        "Temp Max": 26,
+        "Humid Min": 45,
+        "Humid Max": 90,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Cassava",
+        "Temp Min": 16,
+        "Temp Max": 40,
+        "Humid Min": 39,
+        "Humid Max": 99,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Papaya",
+        "Temp Min": 15,
+        "Temp Max": 32,
+        "Humid Min": 26,
+        "Humid Max": 79,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Banana",
+        "Temp Min": 15,
+        "Temp Max": 40,
+        "Humid Min": 29,
+        "Humid Max": 74,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Mango",
+        "Temp Min": 15,
+        "Temp Max": 39,
+        "Humid Min": 43,
+        "Humid Max": 100,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Guava",
+        "Temp Min": 12,
+        "Temp Max": 30,
+        "Humid Min": 33,
+        "Humid Max": 74,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Pineapple",
+        "Temp Min": 11,
+        "Temp Max": 33,
+        "Humid Min": 37,
+        "Humid Max": 95,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Orange",
+        "Temp Min": 19,
+        "Temp Max": 44,
+        "Humid Min": 41,
+        "Humid Max": 86,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Lemon",
+        "Temp Min": 18,
+        "Temp Max": 36,
+        "Humid Min": 30,
+        "Humid Max": 70,
+        "Soil Level Needed": "Moderate"
+    },
+    {
+        "Crop": "Watermelon",
+        "Temp Min": 13,
+        "Temp Max": 34,
+        "Humid Min": 38,
+        "Humid Max": 79,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Muskmelon",
+        "Temp Min": 12,
+        "Temp Max": 36,
+        "Humid Min": 25,
+        "Humid Max": 65,
+        "Soil Level Needed": "Wet"
+    },
+    {
+        "Crop": "Strawberry",
+        "Temp Min": 18,
+        "Temp Max": 36,
+        "Humid Min": 30,
+        "Humid Max": 90,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Blueberry",
+        "Temp Min": 17,
+        "Temp Max": 34,
+        "Humid Min": 26,
+        "Humid Max": 81,
+        "Soil Level Needed": "Wet"
+    },
+    {
+        "Crop": "Grapes",
+        "Temp Min": 17,
+        "Temp Max": 42,
+        "Humid Min": 40,
+        "Humid Max": 91,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Apple",
+        "Temp Min": 16,
+        "Temp Max": 37,
+        "Humid Min": 34,
+        "Humid Max": 78,
+        "Soil Level Needed": "Well-drained"
+    },
+    {
+        "Crop": "Pear",
+        "Temp Min": 12,
+        "Temp Max": 30,
+        "Humid Min": 38,
+        "Humid Max": 95,
+        "Soil Level Needed": "Moist"
+    },
+    {
+        "Crop": "Plum",
+        "Temp Min": 19,
+        "Temp Max": 40,
+        "Humid Min": 44,
+        "Humid Max": 95,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Lychee",
+        "Temp Min": 16,
+        "Temp Max": 37,
+        "Humid Min": 45,
+        "Humid Max": 100,
+        "Soil Level Needed": "Dry"
+    },
+    {
+        "Crop": "Jackfruit",
+        "Temp Min": 12,
+        "Temp Max": 29,
+        "Humid Min": 39,
+        "Humid Max": 80,
+        "Soil Level Needed": "Well-drained"
+    }
+]
