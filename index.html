@@ -9,13 +9,29 @@
 <body>
     <div class="container">
         <h1>Crop Recommendation System</h1>
-        <div class="input-container">
-            <input type="text" id="district-input" placeholder="Enter district name">
-            <button id="recommend-btn">Recommend</button>
+        <div class="input-group">
+            <label for="district">Enter District:</label>
+            <input type="text" id="district" placeholder="e.g., Salem">
         </div>
-        <div id="recommendation-container">
-            <h2>Recommended Crops</h2>
-            <ul id="crop-list"></ul>
+        <div class="input-group">
+            <label for="language">Select Language:</label>
+            <select id="language">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="ta">Tamil</option>
+                <option value="te">Telugu</option>
+                <option value="kn">Kannada</option>
+                <option value="ml">Malayalam</option>
+                <option value="bn">Bengali</option>
+                <option value="mr">Marathi</option>
+                <option value="gu">Gujarati</option>
+                <option value="pa">Punjabi</option>
+            </select>
+        </div>
+        <button id="get-recommendation">Get Recommendation</button>
+        <div id="result" class="result-container" style="display: none;">
+            <h2>Recommended Crops:</h2>
+            <p id="recommendation"></p>
         </div>
     </div>
     <script src="script.js"></script>

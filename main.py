@@ -1,53 +1,65 @@
 import requests
-import json
+import google.generativeai as genai
+from deep_translator import GoogleTranslator
 
-# Load dataset
-with open("dataset_adjusted.json") as f:
-    crops_data = json.load(f)
+# ========== CONFIG ==========
+weather_api_key = "8eb898d0791bcfbcdc92ef8aac59c52d"   # Replace with your OpenWeatherMap API key
+gemini_api_key = "AIzaSyCvGuEhPTOrNT7vrx5uvNGWGH0AJgaTjg0"     # Replace with your Gemini API key
+genai.configure(api_key=gemini_api_key)
 
-# Your OpenWeatherMap API key
-api_key = "8eb898d0791bcfbcdc92ef8aac59c52d"  
+# Language codes (ISO format for Indian languages)
+language_map = {
+    "hindi": "hi",
+    "tamil": "ta",
+    "telugu": "te",
+    "kannada": "kn",
+    "malayalam": "ml",
+    "bengali": "bn",
+    "marathi": "mr",
+    "gujarati": "gu",
+    "punjabi": "pa",
+    "english": "en"
+}
 
-# district name
+# ========== USER INPUT ==========
 district = input("Enter district name: ")
+user_lang = input("Enter preferred language (hindi, tamil, telugu, kannada, malayalam, bengali, marathi, gujarati, punjabi, english): ").lower()
 
-# current weather data
-url = f"http://api.openweathermap.org/data/2.5/weather?q={district},IN&appid={api_key}&units=metric"
+if user_lang not in language_map:
+    print("❌ Language not supported, defaulting to English.")
+    user_lang = "english"
+
+# ========== WEATHER API CALL ==========
+url = f"http://api.openweathermap.org/data/2.5/weather?q={district},IN&appid={weather_api_key}&units=metric"
 response = requests.get(url)
-data = response.json()
 
 if response.status_code == 200:
-    temperature = data['main']['temp']
-    humidity = data['main']['humidity']
-    rainfall = data.get('rain', {}).get('1h', 0)  # mm rainfall last 1 hour, default 0
+    weather_data = response.json()
+    temp = weather_data['main']['temp']
+    humidity = weather_data['main']['humidity']
+    rainfall = weather_data.get('rain', {}).get('1h', 0)
 
-    # Simple soil level logic based on rainfall
-    if rainfall > 10:
-        soil_level = "Wet"
-    elif 3 < rainfall <= 10:
-        soil_level = "Moist"
-    elif 1 < rainfall <= 3:
-        soil_level = "Moderate"
-    else:
-        soil_level = "Dry"
+    # ========== GEMINI API CALL ==========
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
-    # Filter crops
-    recommended = [
-        crop["Crop"] for crop in crops_data
-        if crop["Temp Min"] <= temperature <= crop["Temp Max"]
-        and crop["Humid Min"] <= humidity <= crop["Humid Max"]
-        and crop["Soil Level Needed"] == soil_level
-    ]
+    prompt = f"""
+    Given the weather conditions:
+    - Temperature: {temp}°C
+    - Humidity: {humidity}%
+    - Rainfall: {rainfall} mm
 
-    print(f"\nWeather in {district}:")
-    print(f"Temperature: {temperature}°C")
-    print(f"Humidity: {humidity}%")
-    print(f"Rainfall: {rainfall} mm")
-    print(f"Soil Level: {soil_level}")
+    Recommend 3 suitable crops for cultivation in Indian conditions.
+    Output format: Just the crop names separated by commas, no explanation.
+    """
+    gemini_response = model.generate_content(prompt)
+    english_output = gemini_response.text.strip()
 
-    if recommended:
-        print("\nRecommended Crops:", ", ".join(recommended[:3]))
-    else:
-        print("\nNo crops match the current conditions.")
+    print("\n🌱 Recommended Crops (English):\n", english_output)
+
+    # ========== TRANSLATE OUTPUT ==========
+    translated = GoogleTranslator(source='auto', target=language_map[user_lang]).translate(english_output)
+
+    print(f"\n🌐 Translated Output ({user_lang.capitalize()}):\n", translated)
+
 else:
-    print("Error fetching weather data:", data.get("message", "Unknown error"))
+    print(f"❌ Error {response.status_code}: Unable to fetch weather data. Check district name or API key.")

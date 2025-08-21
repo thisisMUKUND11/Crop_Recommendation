@@ -1,45 +1,78 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const recommendBtn = document.getElementById('recommend-btn');
-    const districtInput = document.getElementById('district-input');
-    const recommendationContainer = document.getElementById('recommendation-container');
-    const cropList = document.getElementById('crop-list');
+    const getRecommendationBtn = document.getElementById('get-recommendation');
+    const districtInput = document.getElementById('district');
+    const languageSelect = document.getElementById('language');
+    const resultDiv = document.getElementById('result');
+    const recommendationPara = document.getElementById('recommendation');
 
-    recommendBtn.addEventListener('click', () => {
+    const weatherApiKey = '8eb898d0791bcfbcdc92ef8aac59c52d';
+    const geminiApiKey = 'AIzaSyCvGuEhPTOrNT7vrx5uvNGWGH0AJgaTjg0';
+
+    getRecommendationBtn.addEventListener('click', async () => {
         const district = districtInput.value.trim();
+        const lang = languageSelect.value;
 
-        if (district) {
-            fetch('/recommend', {
+        if (!district) {
+            alert('Please enter a district name.');
+            return;
+        }
+
+        try {
+            // 1. Get Weather Data
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${district},IN&appid=${weatherApiKey}&units=metric`;
+            const weatherResponse = await fetch(weatherUrl);
+            if (!weatherResponse.ok) {
+                throw new Error('Could not fetch weather data. Check the district name.');
+            }
+            const weatherData = await weatherResponse.json();
+            const temp = weatherData.main.temp;
+            const humidity = weatherData.main.humidity;
+            const rainfall = weatherData.rain ? weatherData.rain['1h'] || 0 : 0;
+
+            // 2. Get Crop Recommendation from Gemini
+            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+            const prompt = `
+            Given the weather conditions:
+            - Temperature: ${temp}°C
+            - Humidity: ${humidity}%
+            - Rainfall: ${rainfall} mm
+
+            Recommend 3 suitable crops for cultivation in Indian conditions.
+            Output format: Just the crop names separated by commas, no explanation.
+            `;
+
+            const geminiResponse = await fetch(geminiUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ district: district })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                    } else {
-                        displayRecommendations(data.recommended_crops);
-                    }
-                })
-                .catch(error => console.error('Error fetching data:', error));
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+
+            if (!geminiResponse.ok) {
+                throw new Error('Could not fetch crop recommendations.');
+            }
+
+            const geminiData = await geminiResponse.json();
+            const englishOutput = geminiData.candidates[0].content.parts[0].text.trim();
+
+            // 3. Translate if necessary
+            let translatedOutput = englishOutput;
+            if (lang !== 'en') {
+                // Note: This is a simplified translation approach. 
+                // A robust solution would use a dedicated translation API on a backend.
+                const translationUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(englishOutput)}&langpair=en|${lang}`;
+                const translationResponse = await fetch(translationUrl);
+                const translationData = await translationResponse.json();
+                translatedOutput = translationData.responseData.translatedText;
+            }
+
+            // 4. Display Result
+            recommendationPara.textContent = translatedOutput;
+            resultDiv.style.display = 'block';
+
+        } catch (error) {
+            alert(`An error occurred: ${error.message}`);
         }
     });
-
-    function displayRecommendations(recommendedCrops) {
-        cropList.innerHTML = '';
-        if (recommendedCrops.length > 0) {
-            recommendedCrops.forEach(crop => {
-                const li = document.createElement('li');
-                li.textContent = crop;
-                cropList.appendChild(li);
-            });
-        } else {
-            const li = document.createElement('li');
-            li.textContent = 'No crops match the current conditions.';
-            cropList.appendChild(li);
-        }
-        recommendationContainer.style.display = 'block';
-    }
 });
