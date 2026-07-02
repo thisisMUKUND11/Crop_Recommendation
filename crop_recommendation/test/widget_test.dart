@@ -1,30 +1,32 @@
-// This is a basic Flutter widget test.
+// Unit tests for HARVEST-IQ.
 //
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// The previous default "counter" smoke test did not match this app (there is
+// no counter, and MyApp requires providers + platform plugins that aren't
+// available in the test harness). It is replaced with a focused, plugin-free
+// test of ThemeProvider's state transitions.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:crop_recommendation/main.dart';
+import 'package:harvest_iq/theme_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('ThemeProvider', () {
+    test('defaults to light mode', () {
+      expect(ThemeProvider().themeMode, ThemeMode.light);
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    test('toggleTheme switches to dark and back to light', () {
+      final provider = ThemeProvider();
+      var notifications = 0;
+      provider.addListener(() => notifications++);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      provider.toggleTheme(true);
+      expect(provider.themeMode, ThemeMode.dark);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+      provider.toggleTheme(false);
+      expect(provider.themeMode, ThemeMode.light);
+
+      expect(notifications, 2);
+    });
   });
 }

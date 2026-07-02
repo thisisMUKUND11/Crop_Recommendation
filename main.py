@@ -1,14 +1,31 @@
+"""Crop recommendation CLI.
+
+Fetches current weather for a district from OpenWeatherMap, asks Gemini for
+suitable crops, and (optionally) translates the result into an Indian language.
+
+API keys are read from environment variables so they are never committed to
+source control:
+
+    export WEATHER_API_KEY=your_openweathermap_key
+    export GEMINI_API_KEY=your_gemini_key
+
+On Windows PowerShell:
+
+    $env:WEATHER_API_KEY = "your_openweathermap_key"
+    $env:GEMINI_API_KEY  = "your_gemini_key"
+
+See .env.example for the full list of variables.
+"""
+
+import os
+import sys
+
 import requests
 import google.generativeai as genai
 from deep_translator import GoogleTranslator
 
-# ========== CONFIG ==========
-weather_api_key = "8eb898d0791bcfbcdc92ef8aac59c52d"   # Replace with your OpenWeatherMap API key
-gemini_api_key = "AIzaSyCvGuEhPTOrNT7vrx5uvNGWGH0AJgaTjg0"     # Replace with your Gemini API key
-genai.configure(api_key=gemini_api_key)
-
 # Language codes (ISO format for Indian languages)
-language_map = {
+LANGUAGE_MAP = {
     "hindi": "hi",
     "tamil": "ta",
     "telugu": "te",
@@ -18,48 +35,92 @@ language_map = {
     "marathi": "mr",
     "gujarati": "gu",
     "punjabi": "pa",
-    "english": "en"
+    "english": "en",
 }
 
-# ========== USER INPUT ==========
-district = input("Enter district name: ")
-user_lang = input("Enter preferred language (hindi, tamil, telugu, kannada, malayalam, bengali, marathi, gujarati, punjabi, english): ").lower()
+WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
 
-if user_lang not in language_map:
-    print("❌ Language not supported, defaulting to English.")
-    user_lang = "english"
 
-# ========== WEATHER API CALL ==========
-url = f"http://api.openweathermap.org/data/2.5/weather?q={district},IN&appid={weather_api_key}&units=metric"
-response = requests.get(url)
+def get_config():
+    """Read required API keys from the environment, exiting if any are missing."""
+    weather_api_key = os.getenv("WEATHER_API_KEY")
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
 
-if response.status_code == 200:
-    weather_data = response.json()
-    temp = weather_data['main']['temp']
-    humidity = weather_data['main']['humidity']
-    rainfall = weather_data.get('rain', {}).get('1h', 0)
+    missing = [
+        name
+        for name, value in (
+            ("WEATHER_API_KEY", weather_api_key),
+            ("GEMINI_API_KEY", gemini_api_key),
+        )
+        if not value
+    ]
+    if missing:
+        sys.exit(
+            "Missing required environment variable(s): "
+            + ", ".join(missing)
+            + ".\nSee .env.example and set them before running."
+        )
+    return weather_api_key, gemini_api_key
 
-    # ========== GEMINI API CALL ==========
+
+def fetch_weather(district, weather_api_key):
+    """Return (temp, humidity, rainfall) for a district, or raise on failure."""
+    response = requests.get(
+        WEATHER_URL,
+        params={"q": f"{district},IN", "appid": weather_api_key, "units": "metric"},
+        timeout=10,
+    )
+    response.raise_for_status()
+    data = response.json()
+    return (
+        data["main"]["temp"],
+        data["main"]["humidity"],
+        data.get("rain", {}).get("1h", 0),
+    )
+
+
+def recommend_crops(temp, humidity, rainfall, gemini_api_key):
+    """Ask Gemini for 3 suitable crops given the weather conditions."""
+    genai.configure(api_key=gemini_api_key)
     model = genai.GenerativeModel("gemini-1.5-flash")
+    prompt = (
+        "Given the weather conditions:\n"
+        f"- Temperature: {temp}°C\n"
+        f"- Humidity: {humidity}%\n"
+        f"- Rainfall: {rainfall} mm\n\n"
+        "Recommend 3 suitable crops for cultivation in Indian conditions.\n"
+        "Output format: Just the crop names separated by commas, no explanation."
+    )
+    return model.generate_content(prompt).text.strip()
 
-    prompt = f"""
-    Given the weather conditions:
-    - Temperature: {temp}°C
-    - Humidity: {humidity}%
-    - Rainfall: {rainfall} mm
 
-    Recommend 3 suitable crops for cultivation in Indian conditions.
-    Output format: Just the crop names separated by commas, no explanation.
-    """
-    gemini_response = model.generate_content(prompt)
-    english_output = gemini_response.text.strip()
+def main():
+    weather_api_key, gemini_api_key = get_config()
 
-    print("\n🌱 Recommended Crops (English):\n", english_output)
+    district = input("Enter district name: ").strip()
+    user_lang = input(
+        "Enter preferred language "
+        f"({', '.join(LANGUAGE_MAP)}): "
+    ).strip().lower()
 
-    # ========== TRANSLATE OUTPUT ==========
-    translated = GoogleTranslator(source='auto', target=language_map[user_lang]).translate(english_output)
+    if user_lang not in LANGUAGE_MAP:
+        print("Language not supported, defaulting to English.")
+        user_lang = "english"
 
-    print(f"\n🌐 Translated Output ({user_lang.capitalize()}):\n", translated)
+    try:
+        temp, humidity, rainfall = fetch_weather(district, weather_api_key)
+    except requests.RequestException as exc:
+        sys.exit(f"Unable to fetch weather data: {exc}")
 
-else:
-    print(f"❌ Error {response.status_code}: Unable to fetch weather data. Check district name or API key.")
+    english_output = recommend_crops(temp, humidity, rainfall, gemini_api_key)
+    print("\nRecommended Crops (English):\n", english_output)
+
+    if user_lang != "english":
+        translated = GoogleTranslator(
+            source="auto", target=LANGUAGE_MAP[user_lang]
+        ).translate(english_output)
+        print(f"\nTranslated Output ({user_lang.capitalize()}):\n", translated)
+
+
+if __name__ == "__main__":
+    main()

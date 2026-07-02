@@ -35,6 +35,12 @@
     "history": "வரலாறு",
     "alreadyHaveAnAccount": "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழையவும்",
     "settings": "அமைப்புகள்",
+    "profile": "சுயவிவரம்",
     "signOut": "வெளியேறு",
-    "language": "மொழி"
+    "language": "மொழி",
+    "listening": "கேட்கிறது...",
+    "speakAgain": "மீண்டும் பேசுங்கள்.",
+    "noRecommendationToShare": "பகிர்வதற்கு பரிந்துரை இல்லை.",
+    "emailAlreadyRegistered": "இந்த மின்னஞ்சல் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது.",
+    "forgotPassword": "கடவுச்சொல்லை மறந்துவிட்டேன்"
 }

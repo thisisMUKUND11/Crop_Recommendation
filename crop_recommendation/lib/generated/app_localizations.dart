@@ -308,6 +308,12 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
   /// No description provided for @signOut.
   ///
   /// In en, this message translates to:
@@ -319,6 +325,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language'**
   String get language;
+
+  /// No description provided for @listening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening...'**
+  String get listening;
+
+  /// No description provided for @speakAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak again.'**
+  String get speakAgain;
+
+  /// No description provided for @noRecommendationToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'No recommendation to share.'**
+  String get noRecommendationToShare;
+
+  /// No description provided for @emailAlreadyRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already registered.'**
+  String get emailAlreadyRegistered;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password'**
+  String get forgotPassword;
 }
 
 class _AppLocalizationsDelegate

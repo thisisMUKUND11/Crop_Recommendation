@@ -1,0 +1,40 @@
+# ===== Secrets =====
+.env
+.env.*
+!.env.example
+config.js
+API.txt
+
+# ===== Node / JS =====
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ===== Flutter / Dart =====
+# Build + tooling artifacts
+crop_recommendation/build/
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+*.iml
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

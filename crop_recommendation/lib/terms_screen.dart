@@ -1,9 +1,10 @@
-
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'storage_service.dart';
-import 'main.dart';
+import 'login_screen.dart';
 import 'generated/app_localizations.dart';
-import 'package:palette_generator/palette_generator.dart';
+import 'main.dart';
+import 'welcome_screen.dart';
 
 class TermsScreen extends StatefulWidget {
   @override
@@ -12,82 +13,149 @@ class TermsScreen extends StatefulWidget {
 
 class _TermsScreenState extends State<TermsScreen> {
   final StorageService _storageService = StorageService();
-  PaletteGenerator? _paletteGenerator;
+  bool _isAccepted = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _updatePalette();
-  }
-
-  Future<void> _updatePalette() async {
-    _paletteGenerator = await PaletteGenerator.fromImageProvider(
-      const AssetImage('assets/images/79bad45b6a18df751d0504ebb14e03f1.jpg'),
-      size: Size(200, 200),
-    );
-    setState(() {});
-  }
+  
 
   Future<void> _acceptTerms(BuildContext context) async {
     await _storageService.setAcceptedTerms(true);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => MainPage()),
-    );
+    final profile = await _storageService.getCurrentUserProfile();
+    if (profile != null) {
+      profile.isFirstTime = false;
+      await _storageService.saveProfile(profile);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WelcomeScreen(profileName: profile.name)),
+      );
+    }
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
-    final Color appBarColor = _paletteGenerator?.dominantColor?.color ?? Colors.green.shade800;
-    final Color textColor = _paletteGenerator?.lightVibrantColor?.color ?? Colors.black;
-    final Color buttonColor = _paletteGenerator?.vibrantColor?.color ?? Colors.green.shade800;
-    final Color overlayColor = _paletteGenerator?.darkMutedColor?.color?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.termsAndConditions),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-      ),
       body: Stack(
         children: [
+          /// Background image
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/79bad45b6a18df751d0504ebb14e03f1.jpg'),
+                image: AssetImage('assets/images/254ff1db7128864fe8f4da0993bd23c2.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
+
+          /// Dark overlay
           Container(
-            color: overlayColor,
+            color: Colors.black.withOpacity(0.5),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Text(
-                      AppLocalizations.of(context)!.termsAndConditionsContent,
-                      style: TextStyle(color: textColor),
+
+          /// Content
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(screenWidth * 0.05),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// Heading
+                  Text(
+                    AppLocalizations.of(context)!.termsAndConditions,
+                    style: TextStyle(
+                      fontFamily: 'serif', // or custom TimesNewRoman
+                      fontSize: screenWidth * 0.07,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => _acceptTerms(context),
-                  child: Text(AppLocalizations.of(context)!.accept),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: buttonColor,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+
+                  SizedBox(height: screenHeight * 0.02),
+
+                  /// Terms text
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Text(
+                        AppLocalizations.of(context)!.termsAndConditionsContent,
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          fontFamily: 'serif',
+                          fontSize: screenWidth * 0.04,
+                          height: 1.5,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
+
+                  SizedBox(height: screenHeight * 0.02),
+
+                  /// Accept / Decline buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07, vertical: screenHeight * 0.02),
+                          backgroundColor: Colors.red.shade600,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          "Decline",  // hardcoded fix
+                          style: TextStyle(
+                            fontFamily: 'serif',
+                            fontSize: screenWidth * 0.045,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: _isAccepted ? () => _acceptTerms(context) : null,
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07, vertical: screenHeight * 0.02),
+                          backgroundColor: Colors.green.shade600,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context)!.accept,
+                          style: TextStyle(
+                            fontFamily: 'serif',
+                            fontSize: screenWidth * 0.045,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Checkbox(
+                        value: _isAccepted,
+                        onChanged: (bool? newValue) {
+                          setState(() {
+                            _isAccepted = newValue!;
+                          });
+                        },
+                        activeColor: Colors.green,
+                      ),
+                      Text(
+                        'I accept the terms and conditions',
+                        style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.035),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],

@@ -1,5 +1,5 @@
-name: crop_recommendation
-description: "A new Flutter project."
+name: harvest_iq
+description: "HARVEST-IQ: an AI-powered crop recommendation app that suggests suitable crops from local weather conditions, with multilingual support."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -17,15 +17,34 @@ dependencies:
     sdk: flutter
   intl: ^0.20.2
   provider: ^6.1.5+1
-  palette_generator: ^0.3.3+3
+  
+  flutter_tts: ^4.0.2
+  geolocator: ^12.0.0
+  geocoding: ^3.0.0
+  share_plus: ^12.0.0
+  google_generative_ai: ^0.4.1
+  table_calendar: ^3.1.2
+  connectivity_plus: ^6.0.3
+  uuid: ^4.5.1
+  flutter_local_notifications: ^19.4.2
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: "^0.13.1"
 
 flutter:
   generate: true
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/local_recommendations.json
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
+  remove_alpha_ios: true # iOS icons must not have transparency
+  min_sdk_android: 21 # set min_sdk_android to appropriate min sdk for your project

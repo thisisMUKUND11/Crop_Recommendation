@@ -124,8 +124,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
+  String get profile => 'Profile';
+
+  @override
   String get signOut => 'Sign Out';
 
   @override
   String get language => 'Language';
+
+  @override
+  String get listening => 'Listening...';
+
+  @override
+  String get speakAgain => 'Speak again.';
+
+  @override
+  String get noRecommendationToShare => 'No recommendation to share.';
+
+  @override
+  String get emailAlreadyRegistered => 'This email is already registered.';
+
+  @override
+  String get forgotPassword => 'Forgot Password';
 }

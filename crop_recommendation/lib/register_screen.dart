@@ -1,10 +1,12 @@
-
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'storage_service.dart';
-import 'login_screen.dart';
 import 'terms_screen.dart';
 import 'generated/app_localizations.dart';
-import 'package:palette_generator/palette_generator.dart';
+import 'profile.dart';
+import 'welcome_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -12,50 +14,66 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _pinController = TextEditingController();
+  final TextEditingController _confirmPinController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  String? _profileImagePath;
   final StorageService _storageService = StorageService();
-  PaletteGenerator? _paletteGenerator;
+  final Uuid _uuid = Uuid();
 
-  @override
-  void initState() {
-    super.initState();
-    _updatePalette();
-  }
+  Future<void> _createProfile() async {
+    if (_formKey.currentState!.validate()) {
+      final profiles = await _storageService.getProfiles();
+      final email = _emailController.text;
+      final profilesWithSameEmail = profiles.where((p) => p.email == email).toList();
 
-  Future<void> _updatePalette() async {
-    _paletteGenerator = await PaletteGenerator.fromImageProvider(
-      const AssetImage('assets/images/3bdb604adcaa41f51606b474953609d4.jpg'),
-      size: Size(200, 200),
-    );
-    setState(() {});
-  }
+      if (profilesWithSameEmail.length >= 2) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('You can only create 2 profiles per email address.'),
+          ),
+        );
+        return;
+      }
 
-  Future<void> _register() async {
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.passwordsDoNotMatch)),
+      final userId = _uuid.v4();
+
+      final newProfile = UserProfile(
+        id: userId,
+        name: _usernameController.text,
+        imagePath: _profileImagePath,
+        pin: _pinController.text,
+        email: email,
+        password: _passwordController.text, // TODO: Hash this password
       );
-      return;
+      await _storageService.saveProfile(newProfile);
+      await _storageService.setCurrentUserId(userId);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WelcomeScreen(profileName: newProfile.name)),
+      );
     }
+  }
 
-    await _storageService.saveUserCredentials(
-        _emailController.text, _passwordController.text);
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-    );
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _profileImagePath = image.path;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final Color overlayColor = _paletteGenerator?.darkMutedColor?.color?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6);
-    final Color textColor = _paletteGenerator?.lightVibrantColor?.color ?? Colors.white70;
-    final Color buttonColor = _paletteGenerator?.vibrantColor?.color ?? Colors.green.shade800;
-    final Color textButtonColor = _paletteGenerator?.lightMutedColor?.color ?? Colors.lightGreen.shade200;
-    final Color titleColor = _paletteGenerator?.dominantColor?.color ?? Colors.white;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Stack(
@@ -63,119 +81,204 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/3bdb604adcaa41f51606b474953609d4.jpg'),
+                image: AssetImage('assets/images/33a5dd847966ceae3071cddfbb1d9382.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           Container(
-            color: overlayColor,
+            color: Colors.black.withOpacity(0.5),
           ),
           Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'HARVEST-IQ',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: titleColor,
-                      fontFamily: 'serif',
+              padding: EdgeInsets.all(screenWidth * 0.04),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Create Profile',
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.08, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                  ),
-                  SizedBox(height: 48),
-                  TextField(
-                    controller: _emailController,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.email,
-                      labelStyle: TextStyle(color: textColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: textColor),
+                    SizedBox(height: screenHeight * 0.06),
+                    TextFormField(
+                      controller: _usernameController,
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Username',
+                        labelStyle: TextStyle(fontFamily: 'Times New Roman', color: Colors.white70, fontSize: screenWidth * 0.04),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: titleColor),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a username';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    TextFormField(
+                      controller: _emailController,
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        labelStyle: TextStyle(fontFamily: 'Times New Roman', color: Colors.white70, fontSize: screenWidth * 0.04),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value)) {
+                          return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    TextFormField(
+                      controller: _passwordController,
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(fontFamily: 'Times New Roman', color: Colors.white70, fontSize: screenWidth * 0.04),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a password';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    TextFormField(
+                      controller: _confirmPasswordController,
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        labelStyle: TextStyle(fontFamily: 'Times New Roman', color: Colors.white70, fontSize: screenWidth * 0.04),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    TextFormField(
+                      controller: _pinController,
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: '4-digit PIN',
+                        labelStyle: TextStyle(fontFamily: 'Times New Roman', color: Colors.white70, fontSize: screenWidth * 0.04),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      maxLength: 4,
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a PIN';
+                        }
+                        if (value.length != 4) {
+                          return 'PIN must be 4 digits';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    TextFormField(
+                      controller: _confirmPinController,
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Confirm PIN',
+                        labelStyle: TextStyle(fontFamily: 'Times New Roman', color: Colors.white70, fontSize: screenWidth * 0.04),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      maxLength: 4,
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your PIN';
+                        }
+                        if (value != _pinController.text) {
+                          return 'PINs do not match';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      child: Text('Upload Profile Image', style: TextStyle(fontSize: screenWidth * 0.04)),
+                    ),
+                    if (_profileImagePath != null)
+                      Padding(
+                        padding: EdgeInsets.only(top: screenHeight * 0.02),
+                        child: Image.file(File(_profileImagePath!), height: screenHeight * 0.1, width: screenHeight * 0.1, fit: BoxFit.cover),
+                      ),
+                    SizedBox(height: screenHeight * 0.03),
+                    ElevatedButton(
+                      onPressed: _createProfile,
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1, vertical: screenHeight * 0.02),
+                        backgroundColor: Colors.green.shade600,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Create Profile',
+                        style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.045),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    controller: _passwordController,
-                    style: TextStyle(color: Colors.white),
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.password,
-                      labelStyle: TextStyle(color: textColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: textColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: titleColor),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    controller: _confirmPasswordController,
-                    style: TextStyle(color: Colors.white),
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.confirmPassword,
-                      labelStyle: TextStyle(color: textColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: textColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: titleColor),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: _register,
-                    child: Text(AppLocalizations.of(context)!.register),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      AppLocalizations.of(context)!.alreadyHaveAnAccount,
-                      style: TextStyle(color: textButtonColor),
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => TermsScreen()),
-                      );
-                    },
-                    child: Text(
-                      AppLocalizations.of(context)!.termsAndConditions,
-                      style: TextStyle(color: textButtonColor),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

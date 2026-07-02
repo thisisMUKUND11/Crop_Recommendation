@@ -1,11 +1,10 @@
-
+import 'email_profiles_screen.dart';
 import 'package:flutter/material.dart';
 import 'storage_service.dart';
 import 'register_screen.dart';
-import 'main.dart';
 import 'terms_screen.dart';
 import 'generated/app_localizations.dart';
-import 'package:palette_generator/palette_generator.dart';
+import 'main.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,58 +12,38 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final StorageService _storageService = StorageService();
-  PaletteGenerator? _paletteGenerator;
-
-  @override
-  void initState() {
-    super.initState();
-    _updatePalette();
-  }
-
-  Future<void> _updatePalette() async {
-    _paletteGenerator = await PaletteGenerator.fromImageProvider(
-      const AssetImage('assets/images/1d8511b11ec30fb28ae1b248401b9b12.jpg'),
-      size: Size(200, 200),
-    );
-    setState(() {});
-  }
 
   Future<void> _login() async {
-    final credentials = await _storageService.getUserCredentials();
-    final email = credentials['email'];
-    final password = credentials['password'];
+    if (_formKey.currentState!.validate()) {
+      final user = await _storageService.getUserCredentialsByEmail(_emailController.text);
 
-    if (email == _emailController.text && password == _passwordController.text) {
-      await _storageService.setLoggedIn(true);
-      final acceptedTerms = await _storageService.hasAcceptedTerms();
-      if (acceptedTerms) {
+      if (user != null && user['password'] == _passwordController.text) {
+        final userId = user['userId']!;
+        await _storageService.setCurrentUserId(userId);
+        await _storageService.setLoggedIn(true);
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MainPage()),
+          MaterialPageRoute(
+            builder: (context) => EmailProfilesScreen(email: _emailController.text),
+          ),
         );
       } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => TermsScreen()),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.invalidEmailOrPassword)),
         );
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.invalidEmailOrPassword)),
-      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final Color overlayColor = _paletteGenerator?.darkMutedColor?.color?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6);
-    final Color textColor = _paletteGenerator?.lightVibrantColor?.color ?? Colors.white70;
-    final Color buttonColor = _paletteGenerator?.vibrantColor?.color ?? Colors.green.shade800;
-    final Color textButtonColor = _paletteGenerator?.lightMutedColor?.color ?? Colors.lightGreen.shade200;
-    final Color titleColor = _paletteGenerator?.dominantColor?.color ?? Colors.white;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Stack(
@@ -72,91 +51,111 @@ class _LoginScreenState extends State<LoginScreen> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/1d8511b11ec30fb28ae1b248401b9b12.jpg'),
+                image: AssetImage('assets/images/2c9ff41ef73ee64a237db67ab4c44c75.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           Container(
-            color: overlayColor,
+            color: Colors.black.withOpacity(0.5),
           ),
           Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'HARVEST-IQ',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: titleColor,
-                      fontFamily: 'serif',
+              padding: EdgeInsets.all(screenWidth * 0.04),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.login,
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.08, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                  ),
-                  SizedBox(height: 48),
-                  TextField(
-                    controller: _emailController,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.email,
-                      labelStyle: TextStyle(color: textColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: textColor),
+                    SizedBox(height: screenHeight * 0.06),
+                    TextFormField(
+                      controller: _emailController,
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.email,
+                        labelStyle: TextStyle(fontFamily: 'Times New Roman', color: Colors.white70, fontSize: screenWidth * 0.04),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: titleColor),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                          return 'Please enter a valid email';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.password,
+                        labelStyle: TextStyle(fontFamily: 'Times New Roman', color: Colors.white70, fontSize: screenWidth * 0.04),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.03),
+                    ElevatedButton(
+                      onPressed: _login,
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1, vertical: screenHeight * 0.02),
+                        backgroundColor: Colors.green.shade600,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context)!.login,
+                        style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.045),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    controller: _passwordController,
-                    style: TextStyle(color: Colors.white),
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.password,
-                      labelStyle: TextStyle(color: textColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: textColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: titleColor),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/forgot_password');
+                      },
+                      child: Text(
+                        AppLocalizations.of(context)!.forgotPassword,
+                        style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: _login,
-                    child: Text(AppLocalizations.of(context)!.login),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RegisterScreen()),
+                        );
+                      },
+                      child: Text(
+                        AppLocalizations.of(context)!.dontHaveAnAccount,
+                        style: TextStyle(fontFamily: 'Times New Roman', fontSize: screenWidth * 0.04, color: Colors.white),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RegisterScreen()),
-                      );
-                    },
-                    child: Text(
-                      AppLocalizations.of(context)!.dontHaveAnAccount,
-                      style: TextStyle(color: textButtonColor),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

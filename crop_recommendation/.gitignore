@@ -1,3 +1,9 @@
+# Secrets — never commit API keys
+env.json
+.env
+.env.*
+!.env.example
+
 # Miscellaneous
 *.class
 *.log

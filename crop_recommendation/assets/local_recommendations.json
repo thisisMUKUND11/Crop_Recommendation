@@ -1,0 +1,25 @@
+
+{
+  "regions": [
+    {
+      "name": "North India",
+      "districts": ["delhi", "gurgaon", "noida", "lucknow", "patna"],
+      "recommendations": ["Wheat", "Mustard", "Barley", "Potato", "Peas"]
+    },
+    {
+      "name": "South India",
+      "districts": ["chennai", "bangalore", "hyderabad", "kochi", "coimbatore"],
+      "recommendations": ["Rice", "Coconut", "Sugarcane", "Cotton", "Ragi"]
+    },
+    {
+      "name": "West India",
+      "districts": ["mumbai", "pune", "ahmedabad", "surat", "jaipur"],
+      "recommendations": ["Cotton", "Groundnut", "Jowar", "Bajra", "Soybean"]
+    },
+    {
+      "name": "East India",
+      "districts": ["kolkata", "bhubaneswar", "guwahati", "ranchi", "shillong"],
+      "recommendations": ["Rice", "Jute", "Tea", "Maize", "Pulses"]
+    }
+  ]
+}

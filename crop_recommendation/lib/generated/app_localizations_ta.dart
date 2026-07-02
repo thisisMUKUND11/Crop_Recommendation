@@ -125,8 +125,27 @@ class AppLocalizationsTa extends AppLocalizations {
   String get settings => 'அமைப்புகள்';
 
   @override
+  String get profile => 'சுயவிவரம்';
+
+  @override
   String get signOut => 'வெளியேறு';
 
   @override
   String get language => 'மொழி';
+
+  @override
+  String get listening => 'கேட்கிறது...';
+
+  @override
+  String get speakAgain => 'மீண்டும் பேசுங்கள்.';
+
+  @override
+  String get noRecommendationToShare => 'பகிர்வதற்கு பரிந்துரை இல்லை.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'இந்த மின்னஞ்சல் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது.';
+
+  @override
+  String get forgotPassword => 'கடவுச்சொல்லை மறந்துவிட்டேன்';
 }

@@ -5,8 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultDiv = document.getElementById('result');
     const recommendationPara = document.getElementById('recommendation');
 
-    const weatherApiKey = '8eb898d0791bcfbcdc92ef8aac59c52d';
-    const geminiApiKey = 'AIzaSyCvGuEhPTOrNT7vrx5uvNGWGH0AJgaTjg0';
+    // Keys come from config.js (gitignored). See config.example.js.
+    const config = window.APP_CONFIG || {};
+    const weatherApiKey = config.WEATHER_API_KEY;
+    const geminiApiKey = config.GEMINI_API_KEY;
+
+    if (!weatherApiKey || !geminiApiKey) {
+        alert('Missing API keys. Copy config.example.js to config.js and add your keys.');
+        return;
+    }
 
     getRecommendationBtn.addEventListener('click', async () => {
         const district = districtInput.value.trim();

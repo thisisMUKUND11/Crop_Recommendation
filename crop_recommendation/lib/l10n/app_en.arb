@@ -35,6 +35,12 @@
     "history": "History",
     "alreadyHaveAnAccount": "Already have an account? Login",
     "settings": "Settings",
+    "profile": "Profile",
     "signOut": "Sign Out",
-    "language": "Language"
+    "language": "Language",
+    "listening": "Listening...",
+    "speakAgain": "Speak again.",
+    "noRecommendationToShare": "No recommendation to share.",
+    "emailAlreadyRegistered": "This email is already registered.",
+    "forgotPassword": "Forgot Password"
 }
