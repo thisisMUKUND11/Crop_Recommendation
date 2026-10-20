@@ -241,10 +241,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     if (isCurrentlyFavorite) {
                       // Find the favorite item to remove by its content
                       final favorites = await _storageService.getFavorites();
-                      final favoriteToRemove = favorites.firstWhere(
-                        (fav) => fav.district == item.district && fav.recommendation == item.recommendation,
-                      );
-                      await _storageService.removeFavorite(favoriteToRemove.id);
+                      final favoriteToRemove = favorites
+                          .where((fav) => fav.district == item.district && fav.recommendation == item.recommendation)
+                          .firstOrNull;
+                      if (favoriteToRemove != null) {
+                        await _storageService.removeFavorite(favoriteToRemove.id);
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Removed from favorites.')),
                       );

@@ -55,7 +55,7 @@ class StorageService {
     final currentUserId = await getCurrentUserId();
     if (currentUserId != null) {
       final profiles = await getProfiles();
-      return profiles.firstWhere((p) => p.id == currentUserId);
+      return profiles.where((p) => p.id == currentUserId).firstOrNull;
     }
     return null;
   }

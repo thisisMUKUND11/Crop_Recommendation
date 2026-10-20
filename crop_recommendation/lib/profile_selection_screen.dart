@@ -1,16 +1,11 @@
 import 'main.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'dart:io';
 
 import 'custom_page_route.dart';
-import 'home_screen.dart';
-import 'language_selection_screen.dart';
-import 'locale_provider.dart';
 import 'profile.dart';
 import 'profile_management_screen.dart';
 import 'storage_service.dart';
-import 'theme_provider.dart';
 import 'welcome_screen.dart';
 import 'pin_entry_dialog.dart';
 import 'forgot_pin_screen.dart';

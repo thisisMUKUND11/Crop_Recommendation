@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'storage_service.dart';
-import 'profile.dart';
 
 class ForgotPinScreen extends StatefulWidget {
   @override
@@ -45,7 +44,8 @@ class _ForgotPinScreenState extends State<ForgotPinScreen> {
       if (_newPinController.text == _confirmPinController.text) {
         if (_userId != null) {
           final profiles = await _storageService.getProfiles();
-          final profile = profiles.firstWhere((p) => p.id == _userId);
+          final profile = profiles.where((p) => p.id == _userId).firstOrNull;
+          if (profile == null) return;
           profile.pin = _newPinController.text;
           await _storageService.saveProfile(profile);
           Navigator.pop(context);

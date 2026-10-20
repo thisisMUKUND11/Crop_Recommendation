@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'quiz_question.dart';
 import 'storage_service.dart';
 
 import 'main.dart';
-import 'generated/app_localizations.dart';
 
 class QuizScreen extends StatefulWidget {
   final List<QuizQuestion> questions;
@@ -64,7 +62,8 @@ class _QuizScreenState extends State<QuizScreen> {
       });
 
       final profiles = await _storageService.getProfiles();
-      final currentUserProfile = profiles.firstWhere((p) => p.id == currentUserId);
+      final currentUserProfile = profiles.where((p) => p.id == currentUserId).firstOrNull;
+      if (currentUserProfile == null) return;
       // Update user's total score
       await _storageService.addPoints(_score);
       // Save quiz questions and date to user profile
@@ -259,7 +258,7 @@ class _QuizScreenState extends State<QuizScreen> {
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               Text(
-                                'Correct Answer: ${question.options.firstWhere((o) => o.startsWith(question.correctAnswer))}',
+                                'Correct Answer: ${question.options.firstWhere((o) => o.startsWith(question.correctAnswer), orElse: () => question.correctAnswer)}',
                                 style: TextStyle(
                                   fontSize: screenWidth * 0.04,
                                   color: Colors.green,

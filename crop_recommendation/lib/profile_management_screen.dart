@@ -3,12 +3,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'storage_service.dart';
 import 'package:uuid/uuid.dart';
-import 'main.dart';
-import 'quiz_question.dart';
 import 'profile.dart';
-import 'language_selection_screen.dart';
 import 'pin_entry_dialog.dart';
-import 'register_screen.dart';
 import 'welcome_screen.dart';
 
 class ProfileManagementScreen extends StatefulWidget {
@@ -95,7 +91,7 @@ class _ProfileManagementScreenState extends State<ProfileManagementScreen> {
           if (nameController.text.isNotEmpty) {
             if (pinController.text.length == 4 && pinController.text == confirmPinController.text) {
               if (isEditing) {
-                profile!.name = nameController.text;
+                profile.name = nameController.text;
                 profile.imagePath = tempImagePath;
                 profile.pin = pinController.text;
                 await _storageService.saveProfile(profile);

@@ -2,9 +2,7 @@ import 'email_profiles_screen.dart';
 import 'package:flutter/material.dart';
 import 'storage_service.dart';
 import 'register_screen.dart';
-import 'terms_screen.dart';
 import 'generated/app_localizations.dart';
-import 'main.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

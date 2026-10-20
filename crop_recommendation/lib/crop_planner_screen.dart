@@ -40,7 +40,7 @@ class _CropPlannerScreenState extends State<CropPlannerScreen> {
 
   Future<void> _loadPlannerData() async {
     final data = await _storageService.readData('crop_planner_${widget.cropName}');
-    if (data != null) {
+    if (data != null && mounted) {
       setState(() {
         _plantingDateController.text = data['plantingDate'] ?? '';
         _harvestingDateController.text = data['harvestingDate'] ?? '';
@@ -56,19 +56,26 @@ class _CropPlannerScreenState extends State<CropPlannerScreen> {
       'notes': _notesController.text,
     };
     await _storageService.saveData('crop_planner_${widget.cropName}', data);
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Planner data saved!')),
     );
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+    // Harvest can't be before planting, so use the planting date as the lower bound.
+    final DateTime firstDate = controller == _harvestingDateController
+        ? (DateTime.tryParse(_plantingDateController.text) ?? DateTime(2000))
+        : DateTime(2000);
+    DateTime initialDate = DateTime.tryParse(controller.text) ?? DateTime.now();
+    if (initialDate.isBefore(firstDate)) initialDate = firstDate;
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
+      initialDate: initialDate,
+      firstDate: firstDate,
       lastDate: DateTime(2101),
     );
-    if (picked != null) {
+    if (picked != null && mounted) {
       setState(() {
         controller.text = DateFormat('yyyy-MM-dd').format(picked);
       });
@@ -78,15 +85,20 @@ class _CropPlannerScreenState extends State<CropPlannerScreen> {
   void _startListening() async {
     if (!_isListening) {
       bool available = await _speech.initialize(
-        onStatus: (status) => setState(() => _isListening = status == 'listening'),
+        onStatus: (status) {
+          if (mounted) setState(() => _isListening = status == 'listening');
+        },
         onError: (errorNotification) => print('Speech error: $errorNotification'),
       );
       if (available) {
         setState(() => _isListening = true);
         _speech.listen(
-          onResult: (result) => setState(() {
-            _notesController.text = result.recognizedWords;
-          }),
+          onResult: (result) {
+            if (!mounted) return;
+            setState(() {
+              _notesController.text = result.recognizedWords;
+            });
+          },
         );
       }
     }
@@ -94,7 +106,7 @@ class _CropPlannerScreenState extends State<CropPlannerScreen> {
 
   void _stopListening() async {
     await _speech.stop();
-    setState(() => _isListening = false);
+    if (mounted) setState(() => _isListening = false);
   }
 
   @override
@@ -110,7 +122,7 @@ class _CropPlannerScreenState extends State<CropPlannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Crop Planner for ${widget.cropName}'),
+        title: Text('Crop Planner for ${widget.cropName}', overflow: TextOverflow.ellipsis),
       ),
       body: Stack(
         children: [
@@ -125,9 +137,14 @@ class _CropPlannerScreenState extends State<CropPlannerScreen> {
           Container(
             color: Colors.black.withOpacity(0.5), // Translucent overlay
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          SafeArea(
+            child: Center(
+            // Keep the form a readable width on tablets/desktop/web.
+            child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
             child: ListView(
+              padding: const EdgeInsets.all(16.0),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               children: [
                 TextFormField(
                   controller: _plantingDateController,
@@ -203,6 +220,8 @@ class _CropPlannerScreenState extends State<CropPlannerScreen> {
                   child: const Text('Save Planner'),
                 ),
               ],
+            ),
+            ),
             ),
           ),
         ],

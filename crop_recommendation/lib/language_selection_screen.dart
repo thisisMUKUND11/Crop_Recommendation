@@ -4,9 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'locale_provider.dart';
 import 'generated/app_localizations.dart';
 import 'storage_service.dart';
-import 'register_screen.dart';
 import 'login_screen.dart';
-import 'profile.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   @override

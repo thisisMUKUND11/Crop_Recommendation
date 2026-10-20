@@ -1,7 +1,7 @@
 import 'profile_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
@@ -17,7 +17,6 @@ import 'login_screen.dart';
 import 'terms_screen.dart';
 import 'language_selection_screen.dart';
 import 'settings_screen.dart';
-import 'splash_screen.dart';
 import 'storage_service.dart'; // Import StorageService
 import 'notification_service.dart'; // Import NotificationService
 import 'forgot_password_screen.dart';
@@ -29,7 +28,12 @@ import 'leaderboard_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService().init(); // Initialize NotificationService
+  try {
+    await NotificationService().init(); // Initialize NotificationService
+  } catch (e) {
+    // Notifications are optional; don't block app start on unsupported platforms.
+    debugPrint('Notification init failed: $e');
+  }
   runApp(
     MultiProvider(
       providers: [
@@ -37,6 +41,76 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ],
       child: MyApp(),
+    ),
+  );
+}
+
+// App-wide Material 3 theme. Poppins is a clean, highly legible sans-serif;
+// Noto Sans Tamil is the fallback so Tamil text renders with a matching style.
+ThemeData buildAppTheme(Brightness brightness) {
+  final isLight = brightness == Brightness.light;
+  final scheme = ColorScheme.fromSeed(
+    seedColor: const Color(0xFF2E7D32),
+    brightness: brightness,
+  );
+  final base = ThemeData(useMaterial3: true, colorScheme: scheme, brightness: brightness);
+  final fallback = [GoogleFonts.notoSansTamil().fontFamily!];
+  final textTheme = GoogleFonts.poppinsTextTheme(base.textTheme)
+      .apply(fontFamilyFallback: fallback);
+  final rounded = RoundedRectangleBorder(borderRadius: BorderRadius.circular(14));
+
+  return base.copyWith(
+    textTheme: textTheme,
+    primaryTextTheme: GoogleFonts.poppinsTextTheme(base.primaryTextTheme)
+        .apply(fontFamilyFallback: fallback),
+    scaffoldBackgroundColor: isLight ? const Color(0xFFF3F8EF) : const Color(0xFF111611),
+    appBarTheme: AppBarTheme(
+      centerTitle: false,
+      elevation: 0,
+      scrolledUnderElevation: 2,
+      titleTextStyle: textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+        color: scheme.onSurface,
+      ),
+    ),
+    cardTheme: CardThemeData(
+      elevation: 0,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        shape: rounded,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        shape: rounded,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        shape: rounded,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+      ),
+    ),
+    chipTheme: base.chipTheme.copyWith(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      side: BorderSide.none,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      shape: rounded,
     ),
   );
 }
@@ -49,18 +123,8 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'HARVEST-IQ',
-          theme: ThemeData(
-            primarySwatch: Colors.green,
-            scaffoldBackgroundColor: Colors.green.shade100,
-            fontFamily: 'Times New Roman',
-            brightness: Brightness.light,
-          ),
-          darkTheme: ThemeData(
-            primarySwatch: Colors.green,
-            scaffoldBackgroundColor: Colors.grey.shade900,
-            fontFamily: 'Times New Roman',
-            brightness: Brightness.dark,
-          ),
+          theme: buildAppTheme(Brightness.light),
+          darkTheme: buildAppTheme(Brightness.dark),
           themeMode: themeProvider.themeMode,
           locale: localeProvider.locale,
           localizationsDelegates: const [
@@ -156,7 +220,7 @@ class _MainPageState extends State<MainPage> {
     final currentUserId = await _storageService.getCurrentUserId();
     if (currentUserId != null) {
       final profiles = await _storageService.getProfiles();
-      _currentUserProfile = profiles.firstWhere((p) => p.id == currentUserId);
+      _currentUserProfile = profiles.where((p) => p.id == currentUserId).firstOrNull;
       // No setState here, as it's called after the future completes in initState
     }
   }

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'storage_service.dart';
-import 'login_screen.dart';
 import 'generated/app_localizations.dart';
-import 'main.dart';
 import 'welcome_screen.dart';
 
 class TermsScreen extends StatefulWidget {

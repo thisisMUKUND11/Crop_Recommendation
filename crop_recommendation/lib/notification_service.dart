@@ -58,9 +58,9 @@ class NotificationService {
           presentSound: true,
         ),
       ),
-      
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
+      // Inexact scheduling does not need the SCHEDULE_EXACT_ALARM permission,
+      // which otherwise makes zonedSchedule throw on Android 12+.
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }
 

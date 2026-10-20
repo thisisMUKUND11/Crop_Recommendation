@@ -3,8 +3,6 @@ import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'storage_service.dart';
-import 'terms_screen.dart';
-import 'generated/app_localizations.dart';
 import 'profile.dart';
 import 'welcome_screen.dart';
 

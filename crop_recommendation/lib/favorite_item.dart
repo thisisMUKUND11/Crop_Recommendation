@@ -1,5 +1,4 @@
 
-import 'package:uuid/uuid.dart';
 
 class FavoriteItem {
   final String id;
